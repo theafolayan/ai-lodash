@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title> Mr Know All</title>
+    <link rel="stylesheet" href="https://bootswatch.com/4/sketchy/bootstrap.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.js" charset="utf-8"></script>
+  </head>
+  <body>
+
+
+  <div id="app" class="text-center">
+    <h1> {{message}}</h1>
+    <div class="form-group">
+    <input type="text" v-model ="question" name="" class="form-control" placeholder="ask a question">
+    </div>
+<div class="text-center">
+<h4>{{answer}}</h4>
+<img v-bind:src ="image" alt="">
+</div>
+
+
+  </div>
+
+<script>
+let app = new Vue({
+  el: '#app',
+  data: {
+    message: "Hi, I'm Mr Know All",
+    question: '',
+    answer: '',
+    image: '',
+    },
+    watch: {
+      question: function(newQuestion){
+        this.answer = ' Waiting for you to stop typing.',
+        this.getAnswer()
+      }
+    },
+    methods:{
+      getAnswer: _.debounce(
+      function(){
+        let ai = this
+        if(this.question.indexOf('?') === -1){
+          ai.answer = " Hey, questions should end with a Question mark don't you think?";
+          return;
+        }
+        ai.answer = 'Thinking....';
+        axios.get('https://yesno.wtf/api').then(function(response){
+          ai.answer = _.capitalize(response.data.answer);
+          ai.image = response.data.image
+        })
+        .catch(function(error){
+          ai.answer = ' Oops:' +error
+        })
+      }, 500
+      )
+    }
+});
+</script>
+  </body>
+</html>
